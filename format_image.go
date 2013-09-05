@@ -37,9 +37,22 @@ func generatePairImageWithDir(dirName string) {
 			dirNewName := filepath.Join(dirName, fileInfoArr[i].Name())
 			generatePairImageWithDir(dirNewName)
 		} else {
-			r, _ := regexp.Compile(".*\\.png")
-			if r.MatchString(fileInfoArr[i].Name()) {
+			rpng, _ := regexp.Compile("(.*\\.png)|(.*\\.PNG)")
+			r2xpng, _ := regexp.Compile(".*[^@]@2x\\.(png|PNG)")
+			if rpng.MatchString(fileInfoArr[i].Name()) {
+
+				if r2xpng.MatchString(fileInfoArr[i].Name()) {
+					continue
+				}
+				stringArr := strings.Split(fileInfoArr[i].Name(), ".")
+
 				imgPath := filepath.Join(dirName, fileInfoArr[i].Name())
+				img2xPath := filepath.Join(dirName, stringArr[0]+"@2x."+stringArr[1])
+
+				_, err := os.Stat(img2xPath)
+				if err == nil {
+					continue
+				}
 				generatePairImage(imgPath)
 			}
 		}
@@ -93,6 +106,6 @@ func generatePairImage(imgName string) {
 	if err != nil {
 		panic(err)
 	} else {
-		fmt.Println(imgName, ",", imgNewName+"\n")
+		fmt.Println(imgName, ",", imgNewName)
 	}
 }
